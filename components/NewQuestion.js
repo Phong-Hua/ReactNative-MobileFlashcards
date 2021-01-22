@@ -1,35 +1,39 @@
 import React, { Component } from 'react';
 import { KeyboardAvoidingView, View, Text, TouchableOpacity, StyleSheet, TextInput } from 'react-native';
-import { blue, white } from '../utils/color';
-import { handleAddNewDeck } from '../actions';
+import { white, blue } from '../utils/color';
 import { connect } from 'react-redux';
 import { borderWidth, borderRadius, buttonHeight, titleBigSize, buttonTextSize } from '../utils/style';
-
-class NewDeck extends Component {
+import { handleAddNewQuestion } from '../actions';
+class NewQuestion extends Component {
 
     constructor(props) {
         super(props);
 
         this.state = {
-            input: ''
+            question: '',
+            answer: '',
         }
     }
 
-
-    handleInput = (input) => {
+    handleQuestionInput = (input) => {
         this.setState(() => ({
-            input,
+            question: input,
+        }))
+    }
+
+    handleAnswerInput = (input) => {
+        this.setState(() => ({
+            answer: input,
         }))
     }
 
     handleSubmit = () => {
-        const { saveDeck } = this.props;
+        const { addQuestion } = this.props;
+        addQuestion(this.state.question, this.state.answer)
 
-        saveDeck(this.state.input)
-
-        // Set State
         this.setState(() => ({
-            input: ''
+            question: '',
+            answer: ''
         }))
     }
 
@@ -38,24 +42,26 @@ class NewDeck extends Component {
             <KeyboardAvoidingView
                 behavior='padding'
                 style={styles.container}>
-                <View style={styles.textContainer}>
-                    <Text
-                        style={styles.title}>
-                        What is the title of your new deck?
-                    </Text>
+                <View style={styles.inputContainer}>
+                    <TextInput
+                        style={[styles.input, styles.shareBorder, styles.shareHeight, styles.shareMargin]}
+                        placeholder='Question'
+                        value={this.state.question}
+                        onChangeText={this.handleQuestionInput}
+                    />
 
                     <TextInput
                         style={[styles.input, styles.shareBorder, styles.shareHeight, styles.shareMargin]}
-                        placeholder='Deck title'
-                        value={this.state.input}
-                        onChangeText={this.handleInput}
+                        placeholder='Answer'
+                        value={this.state.answer}
+                        onChangeText={this.handleAnswerInput}
                     />
                 </View>
                 <View style={styles.buttonContainer}>
                     <TouchableOpacity
-                        style={[styles.submitBtn, styles.shareBorder, styles.shareHeight, styles.shareMargin]}
+                        style={[styles.submitBtn, { borderRadius: borderRadius }, styles.shareHeight, styles.shareMargin]}
                         onPress={this.handleSubmit}
-                        disabled={this.state.input.trim().length === 0}
+                        disabled={this.state.question.trim().length === 0 || this.state.answer.trim().length === 0}
                     >
                         <Text style={styles.submitBtnText}
                         >Submit
@@ -76,10 +82,9 @@ const styles = StyleSheet.create({
     buttonContainer: {
         flex: 1,
         justifyContent: 'center',
-
     },
-    textContainer: {
-        flex: 1,
+    inputContainer: {
+        flex: 2,
         justifyContent: 'center',
     },
     title: {
@@ -107,7 +112,6 @@ const styles = StyleSheet.create({
     },
     submitBtn: {
         backgroundColor: blue,
-        borderColor: blue,
         alignSelf: 'stretch',
         padding: 10,
     },
@@ -118,14 +122,18 @@ const styles = StyleSheet.create({
     }
 })
 
-function mapStateToProps(props) {
-    return props;
-}
-
-function mapDispatchToProps(dispatch) {
+function mapStateToProps(props, { route }) {
+    const { deckTitle } = route.params;
     return {
-        saveDeck: (deckTitle) => dispatch(handleAddNewDeck(deckTitle))
+        deckTitle,
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(NewDeck);
+function mapDispatchToProps(dispatch, { route }) {
+    const { deckTitle } = route.params;
+    return {
+        addQuestion: (question, answer) => dispatch(handleAddNewQuestion(deckTitle, question, answer))
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(NewQuestion);
