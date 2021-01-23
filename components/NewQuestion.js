@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { KeyboardAvoidingView, View, Text, TouchableOpacity, StyleSheet, TextInput } from 'react-native';
-import { white, blue } from '../utils/color';
+import { blue, red, white } from '../utils/color';
 import { connect } from 'react-redux';
 import { borderWidth, borderRadius, buttonHeight, titleBigSize, buttonTextSize } from '../utils/style';
 import { handleAddNewQuestion } from '../actions';
@@ -12,28 +12,47 @@ class NewQuestion extends Component {
         this.state = {
             question: '',
             answer: '',
+            showQuestionError: false,
+            showAnswerError: false,
+            showSuccess: false,
         }
     }
 
     handleQuestionInput = (input) => {
         this.setState(() => ({
             question: input,
+            showQuestionError: false,
+            showAnswerError: false,
+            showSuccess: false,
         }))
     }
 
     handleAnswerInput = (input) => {
         this.setState(() => ({
             answer: input,
+            showQuestionError: false,
+            showAnswerError: false,
+            showSuccess: false,
         }))
     }
 
     handleSubmit = () => {
         const { addQuestion } = this.props;
-        addQuestion(this.state.question, this.state.answer)
+        const question = this.state.question.trim();
+        const answer = this.state.answer.trim();
+
+        if (question.length > 0 && answer.length > 0) {
+            addQuestion(question, answer);
+            this.setState(() => ({
+                question: '',
+                answer: '',
+            }))
+        }
 
         this.setState(() => ({
-            question: '',
-            answer: ''
+            showQuestionError: question.length === 0,
+            showAnswerError: answer.length === 0,
+            showSuccess: question.length > 0 && answer.length > 0,
         }))
     }
 
@@ -56,12 +75,15 @@ class NewQuestion extends Component {
                         value={this.state.answer}
                         onChangeText={this.handleAnswerInput}
                     />
+
+                    {this.state.showQuestionError ? <Text style={[styles.errorText, styles.shareMargin]}>Question cannot be empty</Text> : null}
+                    {this.state.showAnswerError ? <Text style={[styles.errorText, styles.shareMargin]}>Answer cannot be empty</Text> : null}
+                    {this.state.showSuccess ? <Text style={[styles.successText, styles.shareMargin]}>A new card is created</Text> : null}
                 </View>
                 <View style={styles.buttonContainer}>
                     <TouchableOpacity
                         style={[styles.submitBtn, { borderRadius: borderRadius }, styles.shareHeight, styles.shareMargin]}
                         onPress={this.handleSubmit}
-                        disabled={this.state.question.trim().length === 0 || this.state.answer.trim().length === 0}
                     >
                         <Text style={styles.submitBtnText}
                         >Submit
@@ -119,7 +141,15 @@ const styles = StyleSheet.create({
         color: white,
         textAlign: 'center',
         fontSize: buttonTextSize
-    }
+    },
+    successText: {
+        color: blue,
+        textAlign: 'center',
+    },
+    errorText: {
+        color: red,
+        textAlign: 'center',
+    },
 })
 
 function mapStateToProps(props, { route }) {

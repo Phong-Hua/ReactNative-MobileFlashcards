@@ -2,15 +2,14 @@ import React, { Component } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { green, red, white } from '../utils/color';
 import { connect } from 'react-redux';
-import { borderWidth, borderRadius, buttonHeight, buttonTextSize, titleMediumSize } from '../utils/style';
-import { NavigationActions } from 'react-navigation';
+import { borderRadius, buttonHeight, buttonTextSize, titleMediumSize } from '../utils/style';
 
 class Quiz extends Component {
 
     constructor(props) {
         super(props);
         this.state = {
-            showQuestion: true
+            showQuestion: props.showQuestion === undefined ? true : props.showQuestion
         }
     }
 
@@ -30,10 +29,12 @@ class Quiz extends Component {
 
     goToNextScreen = (numberOfCorrect) => {
         const { navigation, isLastQuestion, deckTitle, nextQuestion, totalQuestion } = this.props;
+        const showQuestion = this.state.showQuestion;
 
         if (!isLastQuestion) {
             navigation.navigate('Quiz', {
                 // props go here
+                showQuestion,
                 question: nextQuestion,
                 deckTitle,
                 numberOfCorrect,
@@ -152,7 +153,7 @@ const styles = StyleSheet.create({
 
 function mapStateToProps({ decks }, { route }) {
 
-    const { question, deckTitle, numberOfCorrect } = route.params;
+    const { question, deckTitle, numberOfCorrect, showQuestion } = route.params;
     const allQuestions = decks[deckTitle].questions;
     const currentQuestion = question === undefined ? allQuestions[0] : question;
     const currentQuestionIndex = allQuestions.indexOf(currentQuestion);
@@ -161,6 +162,7 @@ function mapStateToProps({ decks }, { route }) {
     const nextQuestion = (isLastQuestion) ? undefined : allQuestions[currentQuestionIndex + 1];
 
     return {
+        showQuestion,
         currentQuestion,
         deckTitle,
         currentQuestionIndex,

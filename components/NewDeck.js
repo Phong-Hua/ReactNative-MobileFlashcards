@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import { KeyboardAvoidingView, View, Text, TouchableOpacity, StyleSheet, TextInput } from 'react-native';
-import { blue, white } from '../utils/color';
+import { blue, red, white } from '../utils/color';
 import { handleAddNewDeck } from '../actions';
 import { connect } from 'react-redux';
-import { borderWidth, borderRadius, buttonHeight, titleBigSize, buttonTextSize } from '../utils/style';
+import { borderWidth, borderRadius, buttonHeight, titleBigSize, buttonTextSize} from '../utils/style';
 
 class NewDeck extends Component {
 
@@ -11,7 +11,9 @@ class NewDeck extends Component {
         super(props);
 
         this.state = {
-            input: ''
+            input: '',
+            showError: false,
+            showSuccess: false,
         }
     }
 
@@ -19,17 +21,23 @@ class NewDeck extends Component {
     handleInput = (input) => {
         this.setState(() => ({
             input,
+            showError: false,
+            showSuccess: false,
         }))
     }
 
     handleSubmit = () => {
         const { saveDeck } = this.props;
+        const title = this.state.input.trim();
 
-        saveDeck(this.state.input)
+        if (title.length > 0)
+            saveDeck(title)
 
         // Set State
         this.setState(() => ({
-            input: ''
+            input: '',
+            showError: title.length === 0,
+            showSuccess: title.length > 0,
         }))
     }
 
@@ -50,12 +58,13 @@ class NewDeck extends Component {
                         value={this.state.input}
                         onChangeText={this.handleInput}
                     />
+                    {this.state.showError ? <Text style={[styles.errorText, styles.shareMargin]}>Title cannot be empty</Text> : null}
+                    {this.state.showSuccess ? <Text style={[styles.successText, styles.shareMargin]}>A new deck is created</Text> : null}
                 </View>
                 <View style={styles.buttonContainer}>
                     <TouchableOpacity
                         style={[styles.submitBtn, styles.shareBorder, styles.shareHeight, styles.shareMargin]}
                         onPress={this.handleSubmit}
-                        disabled={this.state.input.trim().length === 0}
                     >
                         <Text style={styles.submitBtnText}
                         >Submit
@@ -115,7 +124,15 @@ const styles = StyleSheet.create({
         color: white,
         textAlign: 'center',
         fontSize: buttonTextSize
-    }
+    },
+    successText : {
+        color: blue,
+        textAlign: 'center',
+    },
+    errorText : {
+        color: red,
+        textAlign: 'center',
+    },
 })
 
 function mapStateToProps(props) {
