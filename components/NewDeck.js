@@ -79,7 +79,7 @@ const styles = StyleSheet.create({
 
     },
     textContainer: {
-        flex: 1,
+        flex: 2,
         justifyContent: 'center',
     },
     title: {

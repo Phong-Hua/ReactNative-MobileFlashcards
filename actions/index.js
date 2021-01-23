@@ -1,4 +1,4 @@
-import {getAllDecks, saveDeck} from '../utils/api';
+import {getAllDecks, saveDeck, deleteADeck} from '../utils/api';
 import {initialDeck} from '../utils/_deck';
 import {initQuestion} from '../utils/_question';
 export const RECEIVE_DECKS = 'RECEIVE_DECKS';
@@ -86,8 +86,14 @@ export function handleAddNewDeck(deckTitle) {
 }
 
 export function handleDeleteADeck(deckTitle)  {
-    return (dispatch) => {
+    return (dispatch, getState) => {
+        const removedDeck = getState().decks[deckTitle];
         dispatch(removeADeck(deckTitle));
+        deleteADeck(deckTitle)
+        .catch((error) => {
+            console.warn('An error happened when delete this deck: ', error);
+            dispatch(addNewDeck(removedDeck))
+        })
     }
 }
 

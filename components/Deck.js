@@ -7,6 +7,13 @@ import {handleDeleteADeck} from '../actions';
 
 class Deck extends Component {
 
+    componentDidMount() {
+        // Change the title of the route
+        const {navigation, deckTitle} = this.props;
+        navigation.setOptions({
+            title: deckTitle,
+        });
+    }
 
     goToAddCard = () => {
         const { navigation, deckTitle } = this.props;
@@ -17,7 +24,7 @@ class Deck extends Component {
     }
 
     goToStartQuiz = () => {
-        const { navigation, questions, deckTitle } = this.props;
+        const { navigation, deckTitle } = this.props;
         navigation.navigate('Quiz', {
             // props go here
             deckTitle,
@@ -27,17 +34,15 @@ class Deck extends Component {
 
     deleteDeck = () => {
         const {deckTitle, removeDeck, navigation} = this.props;
+        
+        // navigate to Decks
+        navigation.navigate('Decks');
+
         removeDeck(deckTitle);
-
-        // go back to Home Screen
-
-        navigation.goBack();
     }
 
     render() {
-        const { deckTitle, questions } = this.props;
-        const cards = (questions === undefined || questions.length === 0) ? 0 : questions.length;
-
+        const { deckTitle, cards } = this.props;
         return (
             <View style={styles.container}>
                 <View style={styles.textContainer}>
@@ -157,18 +162,21 @@ const styles = StyleSheet.create({
 })
 
 function mapStateToProps({ decks }, { route, navigation }) {
-    console.log('navigation: ', navigation);
+
     const { deckTitle } = route.params;
-    const questions = decks[deckTitle].questions;
+    const cards = (decks[deckTitle] === undefined) ? 0 : decks[deckTitle].questions.length;
     return {
         deckTitle,
-        questions,
+        cards,
     }
 }
 
-function mapDispatchToProps(dispatch) {
+function mapDispatchToProps(dispatch, { route }) {
+
+    const { deckTitle } = route.params;
     return {
-        removeDeck: (deckTitle) => dispatch(handleDeleteADeck(deckTitle)),
+        removeDeck: () => dispatch(handleDeleteADeck(deckTitle)),
+        dispatch,
     }
 }
 

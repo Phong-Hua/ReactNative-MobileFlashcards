@@ -19,4 +19,18 @@ export function getAllDecks() {
     return AsyncStorage.getItem(DECK_STORAGE_KEY).then(formatDeckResult)
 }
 
-// export function deleteDeck(title)
+/**
+ * Delete a deck that has this title.
+ * Steps:
+ * 1. Get all decks from AsyncStorage.
+ * 2. Remove the deck that has title from all decks.
+ * 3. Save all decks to AsyncStorage.
+ * @param {} title 
+ */
+export function deleteADeck(title) {
+    return getAllDecks().then((allDeck) => {
+        allDeck[title] = undefined;
+        delete allDeck[title];
+        AsyncStorage.setItem(DECK_STORAGE_KEY, JSON.stringify(allDeck))
+    })
+}

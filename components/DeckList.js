@@ -4,9 +4,7 @@ import { connect } from 'react-redux';
 
 import { handleInitialData } from '../actions';
 import { gray, blue, white } from '../utils/color';
-import { borderWidth, borderRadius, titleBigSize } from '../utils/style';
-import Deck from './Deck';
-
+import { borderWidth, borderRadius, titleBigSize, titleMediumSize } from '../utils/style';
 
 class DeckList extends Component {
 
@@ -58,7 +56,12 @@ class DeckList extends Component {
                 {loading
                     ?
                     <ActivityIndicator />
-                    : <FlatList data={this.decksToList(decks)}
+                    :
+                    (Object.keys(decks).length === 0)
+                    ?
+                    <Text style={{fontWeight: 'bold', fontSize: titleMediumSize, textAlign: 'center'}}>You don't have any deck. Start by create a new deck</Text>
+                    :
+                    <FlatList data={this.decksToList(decks)}
                         renderItem={(deck) => this.renderDeck(deck.item)}
                         keyExtractor={item => item.title}
                     />
@@ -68,9 +71,7 @@ class DeckList extends Component {
     }
 }
 
-function mapStateToProps({ decks }, { navigation }) {
-
-
+function mapStateToProps({ decks }) {
     return { decks };
 }
 
@@ -82,9 +83,8 @@ function mapDispatchToProps(dispatch) {
 
 const styles = StyleSheet.create({
     container: {
-        // flex: 1,
-        // justifyContent: 'center',
-        
+        flex: 1,
+        justifyContent: 'center',        
     },
     deck: {
         backgroundColor: white,

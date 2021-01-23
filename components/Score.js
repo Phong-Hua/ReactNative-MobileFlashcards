@@ -1,11 +1,18 @@
 import React, { Component } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { black, white, gray, gold, red, blue } from '../utils/color';
 import { connect } from 'react-redux';
-import { borderWidth, borderRadius, buttonHeight, titleBigSize, buttonTextSize } from '../utils/style';
 import { Ionicons, Entypo } from '@expo/vector-icons';
+import { white, gray, gold, red, blue } from '../utils/color';
+import { borderWidth, borderRadius, buttonHeight, titleBigSize, buttonTextSize } from '../utils/style';
+import {setLocalNotification, clearLocalNotification} from '../utils/notifications';
 
 class Score extends Component {
+
+    // Up to this screen, users already did what we want, so we clear notification for today and set notification for tommorrow.
+    componentDidMount() {
+        clearLocalNotification()
+        .then(setLocalNotification)
+    }
 
     renderTrophy = () => {
         return <Ionicons name='trophy' color={gold} size={24} />
@@ -19,7 +26,7 @@ class Score extends Component {
         const { navigation } = this.props;
         navigation.reset({
             index: 0,
-            routes: [{ name: 'Deck List', }],
+            routes: [{ name: 'Home', }],
         });
     }
 
@@ -40,7 +47,7 @@ class Score extends Component {
                         style={[styles.title, { color: red }]}>
                         Your Score is {percentage}%
                     </Text>
-                    {percentage === 100 ? this.renderTrophy() : percentage >= 50 ? this.renderThumbsUp() : ''}
+                    {percentage === 100 ? this.renderTrophy() : percentage >= 50 ? this.renderThumbsUp() : null}
                 </View>
                 <View style={styles.buttonContainer}>
                     <TouchableOpacity
@@ -114,6 +121,7 @@ const styles = StyleSheet.create({
     },
     homeBtn: {
         backgroundColor: blue,
+        borderColor: blue,
         alignSelf: 'stretch',
         padding: 10,
     },
